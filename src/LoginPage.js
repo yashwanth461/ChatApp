@@ -1,19 +1,38 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   TextInput,
   Button,
   StyleSheet,
-  SafeAreaView,
   View,
 } from 'react-native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 //install react native firebase dependency
 import auth from '@react-native-firebase/auth';
+import {CommonActions} from "@react-navigation/native";
 
 //renders login screen with user inputs
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    // Check if the user is already authenticated
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      if (user) {
+        // User is authenticated, navigate to the Home page
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: 'TabNavigator'}],
+          }),
+        );
+      }
+    });
+
+    // Clean up the subscription when the component unmounts
+    return () => unsubscribe();
+  }, [navigation]);
 
   //it is used to login
   const handleLogin = () => {
@@ -24,7 +43,12 @@ const LoginScreen = ({navigation}) => {
         const user = userCredential.user;
         if (user) {
           // Proceed with navigation or other actions
-          navigation.navigate('TabNavigator', {name: user.email}); //Its shows username in profile screen
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: 'TabNavigator'}],
+            }),
+          );
         }
         console.log('user', user);
       })
@@ -37,26 +61,8 @@ const LoginScreen = ({navigation}) => {
       });
   };
 
-  //Used for creating/registering the user email and password
-  const handleRegister = () => {
-    auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        // Login successful
-        const user = userCredential.user;
-        // Proceed with navigation or other actions
-        if(user) alert('Successfully Registered');
-      })
-      .catch(error => {
-        // Handle login error
-        const errorMessage = error.message;
-        // Display error message to the user
-        alert(errorMessage);
-      });
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaProvider style={styles.container}>
       <View style={{flex: 1, justifyContent: 'center', width: '90%'}}>
         <Text style={[styles.label]}>Email</Text>
 
@@ -83,16 +89,13 @@ const LoginScreen = ({navigation}) => {
             Login
           </Button>
         </View>
-        <View style={{marginLeft: 20}}>
-          <Button
-            title="Register"
-            style={styles.button}
-            onPress={handleRegister}>
-            Register
+        <View style={{marginLeft: 20, marginBottom: 20}}>
+          <Button title="Back" style={styles.button} onPress={()=> navigation.navigate("Home")}>
+            Login
           </Button>
         </View>
       </View>
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

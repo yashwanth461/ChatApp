@@ -20,7 +20,6 @@ const ProfileScreen = ({navigation}) => {
     } 
   };
 
-  
 
   return (
     <View style={styles.container}>

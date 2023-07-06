@@ -1,7 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'; //install dependency. 
 import React from 'react';
 import ProfileScreen from './Profile';
-import MessagesScreen from './MessegeScreen';
+import MessagesScreen from './NewMessageScreen';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Tab = createBottomTabNavigator();  
